@@ -1,16 +1,65 @@
-name: Agent tests
-on: [push, pull_request]
+name: Agent tests and performance
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: agent-tests-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install 'uagents==0.26.1'
-      - run: python -m unittest discover -s tests -v
-      - name: Discovery outcome evals (fixtures, not ASI delivery)
+      - name: Regression suite
+        run: python -m unittest discover -s tests -v
+      - name: Discovery correctness (fixtures)
+        if: ${{ !cancelled() }}
         run: python evals/run.py --mode fixture
+      - name: Realistic scenarios and handler performance
+        if: ${{ !cancelled() }}
+        run: python evals/performance.py --repeats 20 --budget-ms 250
+      - name: Publish scorecards
+        if: always()
+        run: |
+          for report in .eval-results/*.md; do
+            if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: offline-evaluation-${{ github.sha }}
+          path: .eval-results/
+          include-hidden-files: true
+          retention-days: 14
+  live-discovery:
+    # Read-only public MCP only. No third-party target messages or ASI account secrets.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'uagents==0.26.1'
+      - name: Live MCP correctness and latency (30-second per-case budget)
+        run: python evals/run.py --mode mcp
+      - name: Publish live discovery scorecard
+        if: always()
+        run: |
+          if [ -f .eval-results/mcp.md ]; then cat .eval-results/mcp.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-discovery-${{ github.sha }}
+          path: .eval-results/
+          include-hidden-files: true
+          retention-days: 14

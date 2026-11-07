@@ -1,0 +1,8 @@
+[
+  {"id":"clinical-trial-search","name":"TrialFinder","description":"Find recruiting clinical trials","task_terms":["fictional","type 2 diabetes","Melbourne","study links","recruitment status","Do not register"],"rubric_terms":["person is eligible","checkable"]},
+  {"id":"nail-appointment","name":"Salon Helper","description":"Find a manicure appointment","task_terms":["A$70","Saturday","Melbourne","availability","Do not book"],"rubric_terms":["budget","verified availability"]},
+  {"id":"monthly-budget","name":"Budget Buddy","description":"Help manage expenses","task_terms":["4200","1800","600","Do not trade"],"rubric_terms":["1360","760","assumptions"]},
+  {"id":"travel-planning","name":"Travel Planner","description":"Plan a trip","task_terms":["two adults","A$300","rainy-day","Do not book"],"rubric_terms":["budget for two","estimates"]},
+  {"id":"friends-meetup","name":"Mori Together","description":"Help friends plan a meetup","task_terms":["90-minute","A$40","quiet","walk","rain alternative","Do not contact"],"rubric_terms":["both preferences","combined budget"]},
+  {"id":"beginner-learning","name":"Study Helper","description":"A beginner tutor","task_terms":["Python loops","20 minutes","two exercises","answers kept separate"],"rubric_terms":["technically correct","exercises"]}
+]

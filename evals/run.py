@@ -3,6 +3,7 @@ import argparse
 from contextlib import nullcontext
 from datetime import datetime, timezone
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -91,7 +92,11 @@ def run_discovery(mode):
 
 def build_report(layer, results):
     passed = sum(result['status'] == 'pass' for result in results)
-    return {'schema_version': 1, 'layer': layer, 'generated_at': datetime.now(timezone.utc).isoformat(),
+    elapsed = sorted(result['elapsed_seconds'] for result in results if 'elapsed_seconds' in result)
+    timing = ({'samples': len(elapsed), 'p50_seconds': elapsed[max(0, math.ceil(len(elapsed)*.5)-1)],
+               'p95_seconds': elapsed[max(0, math.ceil(len(elapsed)*.95)-1)], 'max_seconds': max(elapsed)}
+              if elapsed else {})
+    return {'latency': timing, 'schema_version': 1, 'layer': layer, 'generated_at': datetime.now(timezone.utc).isoformat(),
             'commit': subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(),
             'working_tree_dirty': bool(subprocess.check_output(['git','status','--porcelain'], cwd=ROOT, text=True).strip()),
             'total': len(results), 'passed': passed, 'failed': len(results)-passed,
@@ -157,6 +162,8 @@ def main():
     (args.output / f'{args.mode}.json').write_text(json.dumps(report, indent=2) + '\n')
     lines = [f'# {args.mode} evaluation', '', f"Gate: **{report['gate'].upper()}** — {report['passed']}/{report['total']} cases passed.", '', '| Case | Result | Failures |', '| --- | --- | --- |']
     lines += [f"| {result['id']} | {result['status']} | {'; '.join(result['failures']) or '—'} |" for result in results]
+    if report['latency']:
+        lines += ['', 'Latency (seconds): ' + json.dumps(report['latency'])]
     lines += ['', report['limits'], '']
     (args.output / f'{args.mode}.md').write_text('\n'.join(lines))
     print(f"{args.mode}: {report['passed']}/{report['total']} passed; gate={report['gate']}; report={args.output / (args.mode + '.md')}")

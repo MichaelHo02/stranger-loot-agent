@@ -54,7 +54,7 @@ uv pip install --python .venv/bin/python 'uagents==0.26.1'
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Tests cover plan confirmation, ownership/session isolation, expiration, cancellation, replay and concurrent-confirmation protection, scoring, timeouts, oversized responses, discovery scope, and real uAgents dispatcher correlation. They use controlled responses and make no calls to other people's agents. GitHub Actions runs them on pushes and pull requests. These checks do not establish successful live delivery to a third-party agent.
+Tests cover plan confirmation, ownership/session isolation, expiration, cancellation, replay and concurrent-confirmation protection, scoring, timeouts, oversized responses, discovery scope, and real uAgents dispatcher correlation. They use controlled responses and make no calls to other people's agents. GitHub Actions runs them on pushes and pull requests, together with six realistic scenario benchmarks (20 repetitions each). Pushes also run live read-only MCP discovery and publish latency scorecards; there is no daily schedule. See [automation and performance budgets](evals/README.md#automated-suite-and-performance-budgets). These checks do not establish successful live delivery to a third-party agent.
 
 Work and push directly on `main` (see `AGENTS.md`). Keep `.env`, credentials and `.avctl/` local. Agentverse manages identity. Deploy with `avctl hosting deploy`, then inspect `avctl hosting logs`. GitHub pushes do not update Agentverse.
 

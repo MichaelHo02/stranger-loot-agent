@@ -38,7 +38,7 @@ From the repository root, with the existing Python environment:
 
 Each command writes a JSON record and Markdown scorecard under ignored `.eval-results/`. Failing evals exit 1. Reported provenance includes the code commit and whether the working tree was dirty. The ASI report separately identifies the deployed commit that was actually observed. A live catalogue case can fail because source coverage changed; investigate that result rather than silently dropping the case.
 
-GitHub Actions runs code tests plus fixture outcome evals on every push. A green Actions run does **not** run or pass the live MCP or ASI gate. Live checks must be run explicitly.
+GitHub Actions runs regression tests, fixture evals, scenario performance and live MCP discovery on every push. A green Actions run does **not** pass the visible ASI gate; that requires separate UI evidence.
 
 ## ASI UI observation protocol
 
@@ -57,3 +57,23 @@ The current failed observation waited 62.13 seconds. Agentverse logged inbound p
 `readiness` requires passing fixture, live MCP and visible ASI reports for the current commit. Fixture/MCP reports from an uncommitted tree fail. ASI evidence must identify the deployed commit, be no more than one hour old, and pass visible-response checks again. Missing reports, empty result sets, stale versions, generic help instead of a shortlist, late replies and no replies all keep readiness red. This command reports readiness; it does not deploy anything.
 
 Delivery and discovery are the first gate. Do not add more target scoring features while this gate fails. Later eval sets should cover plan confirmation, real correlated target responses, timeout handling and the quality of assessments. Existing offline workflow tests remain useful but cannot substitute for those live outcomes.
+
+## Automated suite and performance budgets
+
+Every push now runs two separate GitHub Actions jobs (no scheduled runs):
+
+- **Offline correctness and performance:** regression tests, the 15 discovery fixture cases, and six realistic service scenarios repeated 20 times each. Scenarios exercise profile-address parsing, name-based plans, saved state across turns, `start`, replay suppression, and an evidence report with a review checklist. No external target is contacted. The handler-only p95 budget is 250 ms per scenario; network time is excluded.
+- **Live discovery:** the same 15 discovery cases against the public Stranger Loot MCP, requiring the expected candidate and a maximum of 30 seconds per case. The scorecard reports p50, p95 and maximum latency, including MCP initialization and network calls. Catalogue changes can cause genuine failures.
+
+Pull requests run the offline job only. A manual **Run workflow** is also available. Reports appear in the Actions run summary and JSON/Markdown artifacts retained for 14 days, including failed evaluations. Concurrent pushes on the same ref cancel the older run. There are no automatic deployments, purchases, messages to other people's agents, or stored ASI account credentials.
+
+Run locally:
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python evals/performance.py --repeats 20 --budget-ms 250
+.venv/bin/python evals/run.py --mode fixture
+.venv/bin/python evals/run.py --mode mcp
+```
+
+Scenario requirements live in `evals/scenarios.json`. All 120 repetitions must satisfy their requirements; measured p50/p95 values are observations on that runner, not a load test or hosted speed guarantee. Synthetic target responses validate reporting only, not an actual target's competence. This automation does **not** verify hosted Agentverse delivery or visible ASI replies. Keep the existing visible ASI gate separate; green CI does not imply readiness.
