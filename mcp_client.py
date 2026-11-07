@@ -3,6 +3,7 @@ import json
 import os
 from urllib.request import Request, urlopen
 from urllib.parse import urlparse
+from test_runner import agent_address
 
 DEFAULT_URL = 'https://stranger-loot.base44.app/api/mcp'
 MAX_BYTES = 4 * 1024 * 1024
@@ -76,14 +77,23 @@ class StrangerLootMCP:
             data = json.loads(next(part['text'] for part in result.get('content', []) if part.get('type') == 'text'))
         records = data.get('records', [])
         gallery = records[0].get('snapshot', {}).get('gallery', {}).get('data', {}) if records else {}
-        items = gallery.get('items', [])
+        snapshot_items = gallery.get('items', [])
+        items = []
+        for item in snapshot_items:
+            links = [item.get('public_url'), item.get('url'),
+                     (item.get('try_cta') or {}).get('url'), item.get('agent_address')]
+            address = next((agent_address(link) for link in links if isinstance(link, str) and agent_address(link)), None)
+            if address:
+                items.append(dict(item, target_address=address))
         needle = search.casefold()
         matches = [item for item in items if needle in (str(item.get('name', '')) + ' ' + str(item.get('one_liner', ''))).casefold()]
-        lines = ['Stranger Loot public catalogue (snapshot: %s)' % gallery.get('as_of', 'unknown')]
+        lines = ['ASI/Agentverse projects in Stranger Loot (snapshot: %s)' % gallery.get('as_of', 'unknown')]
+        lines.append('This snapshot contains %s of %s projects; discovery may be incomplete.' %
+                     (len(snapshot_items), gallery.get('total', len(snapshot_items))))
         for item in matches[:5]:
-            lines.append('%s: %s\n%s' % (str(item.get('name', ''))[:100], str(item.get('one_liner', ''))[:350], str(item.get('url', ''))[:300]))
+            lines.append('%s: %s\nAgent: %s\n%s' % (str(item.get('name') or '')[:100], str(item.get('one_liner') or '')[:350], item['target_address'], str(item.get('url') or '')[:300]))
         if not matches:
-            lines.append('No matching projects in the public snapshot.')
+            lines.append('No matching ASI/Agentverse addresses in this snapshot. Supply an agent1 address or ASI/Agentverse profile link to test an agent directly.')
         lines.append('Catalogue descriptions are unverified claims, not hands-on test results.')
         return '\n\n'.join(lines)
 
@@ -97,4 +107,7 @@ def reply_to_command(text):
         return 'Connected to Stranger Loot MCP. Enabled read-only tools: ' + (', '.join(tools) or 'none')
     if text.casefold() == 'projects' or text.casefold().startswith('projects '):
         return StrangerLootMCP().projects(text[8:].strip())
-    return 'I can read Stranger Loot’s public project catalogue. Send "projects", "projects <search words>", or "mcp tools".'
+    return ('I find Fetch.ai projects and test Agentverse agents through chat. '
+            'Send projects or projects <search words>. To test, supply the target agent1 address: '
+            'test <address> | <fictional task> | <expected text>. I show a plan before you confirm. '
+            'No websites or payments. Send mcp tools to check the catalogue connection.')

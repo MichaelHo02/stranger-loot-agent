@@ -1,27 +1,51 @@
 # Stranger Loot Tester
 
-An Agentverse hosted agent that reads the Stranger Loot public project catalogue through MCP. Uses the Agent Chat Protocol with acknowledgements and a published manifest.
+Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-message Chat Protocol test of another agent. This first version gives an evidence-backed **assertion score**, not a general quality ranking.
 
-## Try it
+## Features
 
-- `mcp tools` — connect and discover the enabled public catalogue tool.
-- `projects` — show up to five projects from the public snapshot.
-- `projects agent` — search project names and descriptions.
+- `projects` or `projects <search words>`: find projects with an explicit ASI/Agentverse address in the public MCP snapshot.
+- `test <agent1 address or ASI/Agentverse profile link> | <fictional task> | <expected text>`: prepare a test plan.
+- `confirm <plan token>`: send the exact task once, wait up to 60 seconds, and report the observed text and timing.
+- `cancel`: discard a pending plan without sending a test.
+- `mcp tools`: check the read-only catalogue connection.
+
+A plan explains its target, exact input, expected substring and scoring before execution. Plans expire after five minutes and can only be confirmed by their creator in the same chat session. Use fictional, non-sensitive inputs and ask the target only for a reply. The target controls its own behavior.
+
+The test uses the Agent Chat Protocol, accepting only a ChatMessage from the target in the matching session. An acknowledgement is not a test result. Target output is displayed as untrusted evidence and never executed as a command. Duplicate incoming messages and recent late target responses are suppressed.
+
+## Scoring
+
+- **100/100**: the actual response contains the agreed expected text, case-insensitive.
+- **0/100**: a text response arrived but did not contain it.
+- **Blocked, unscored**: no usable reply, transport error, timeout, non-text reply, or more than 6000 characters.
+
+This is one text-containment assertion. A response that merely echoes the expected text can pass. It does not establish factual correctness, safety, consistency, or overall usefulness. No semantic or LLM judging is implemented. Every report includes the exact input, expected text, observed output when usable, elapsed time, and limitations.
+
+## Limitations
+
+Only ASI/Agentverse chat agents are test targets. There is no website/browser testing, purchasing, payment integration, automatic benchmark suite, or report saving. Only the first text response is assessed; multi-message/streamed answers may be incomplete.
+
+Discovery reads the `community-feeds` gallery snapshot exposed by Stranger Loot MCP. It may cover only part of the directory and omits projects without a published agent address. A Fetch.ai challenge entry alone does not establish that an agent exists. Supply an address or profile link directly when needed. No agent has been independently rated by this implementation yet.
+
+One test is allowed per chat session during a 15-minute in-memory retention window, preventing reuse of a response session for a second test. Start a new chat for another run. State and duplicate suppression reset on restart. Maximum 100 retained plans and 2000 recent incoming message identifiers per process.
 
 ## MCP connection
 
-Default endpoint: https://stranger-loot.base44.app/api/mcp
+Default: https://stranger-loot.base44.app/api/mcp
 
-Optionally set `STRANGER_LOOT_MCP_URL` in Agentverse environment configuration to override the endpoint with another trusted HTTPS server. No credentials are needed for the current public endpoint.
+Optionally override `STRANGER_LOOT_MCP_URL` with a trusted HTTPS endpoint in Agentverse environment configuration. No credentials are needed for the current public server. The client initializes MCP, discovers tools, and only calls the reviewed `query_publiccatalogue` tool with its read-only annotation. Payment, contact, recovery, and private entity tools are excluded.
 
-The client initializes MCP, discovers tools, and only permits `query_publiccatalogue` with its read-only annotation. It reads the `community-feeds` gallery snapshot. Payment, recovery, contact, and other entity tools are not enabled. No writes, paid reports, agent testing, or payments are implemented.
+## Development and automated verification
 
-Requests have a 15-second socket timeout and a 4 MiB response limit. Commands are limited to 500 characters; results include at most five projects. Network calls run off the chat event loop. Failures return a safe availability message without server details.
+Python 3.10–3.12; uAgents 0.26.1 or later. Run:
 
-Catalogue content is third-party data: descriptions are unverified claims, not evidence that the advertised functionality was tested. Results include the snapshot timestamp.
+```sh
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python 'uagents==0.26.1'
+.venv/bin/python -m unittest discover -s tests -v
+```
 
-## Development
+Tests cover plan confirmation, ownership/session isolation, expiration, cancellation, replay and concurrent-confirmation protection, scoring, timeouts, oversized responses, discovery scope, and real uAgents dispatcher correlation. They use controlled responses and make no calls to other people's agents. GitHub Actions runs them on pushes and pull requests. These checks do not establish successful live delivery to a third-party agent.
 
-Python 3.10–3.12, with dependencies from `pyproject.toml`. Agentverse manages agent identity; do not configure a seed, mailbox or local endpoint.
-
-Work and push directly on `main`, as recorded in `AGENTS.md`. Keep `.env` and `.avctl/` local. Deploy from this directory using `avctl hosting deploy`, then inspect `avctl hosting logs`. A GitHub push alone does not update Agentverse.
+Work and push directly on `main` (see `AGENTS.md`). Keep `.env`, credentials and `.avctl/` local. Agentverse manages identity. Deploy with `avctl hosting deploy`, then inspect `avctl hosting logs`. GitHub pushes do not update Agentverse.
