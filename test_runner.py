@@ -64,6 +64,9 @@ class Plan:
     report: str | None = None
     name: str = 'the selected agent'
     rubric: str = ''
+    advertised: str = ''
+    rules_version: str = ''
+    rules_checked: str = ''
 
 
 class TestRunner:
@@ -191,6 +194,14 @@ class TestRunner:
                           f' Expected phrase: {plan.expected!r}.\n'
                           'This checks wording only; correctness, safety, consistency and overall project quality remain unverified. '
                           'No quality score assigned.')
+        if plan.rules_version:
+            result += (f'\n\nProject claim (not verified): {plan.advertised}\n'
+                       f'Rules reference: Stranger Builds {plan.rules_version}, fetched {plan.rules_checked} (snapshot, not live).\n'
+                       'Fetch.ai review: usefulness needs evidence from the reply; a published agent and this contact do not prove overall reliability. '
+                       'Repo creation date, genuine sponsor integration, outside-team ASI hire, feedback and feedback-driven change remain unverified. '
+                       'People judge entries; this is not an official score or eligibility decision.\n'
+                       + ('Next step: check the target connection and repeat before judging its usefulness.' if reply is None else
+                          'Next step: verify the quoted answer against the review checklist and independently check any sources.'))
         plan.report = result
         self.on_change()
         return result

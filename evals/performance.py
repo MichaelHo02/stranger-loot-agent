@@ -85,6 +85,20 @@ async def sample(chat, case):
         failures.append('Missing named evidence report and rubric')
     if TARGET in report or plan.token in report or '100/100' in report or 'PASS' in report:
         failures.append('Report exposes IDs or invents a quality pass')
+    # A second fresh chat exercises the automatic workflow with the same service.
+    context = SimpleNamespace(storage=Storage(), session=uuid4(),
+                              agent=SimpleNamespace(address=SELF), send=AsyncMock())
+    candidate = {'target_address':TARGET, 'name':case['name'], 'one_liner':case['description']}
+    with patch('investigation.StrangerLootMCP.discover', return_value=('catalogue', [candidate])):
+        auto_text = await turn('@' + SELF + ' investigate this project')
+    auto_plan = WorkflowState(context.storage).runner.plans.get(('owner', str(context.session)))
+    if auto_plan is None or auto_plan.state != 'waiting' or not auto_plan.rules_version:
+        failures.append('Automatic workflow did not persist a running rules-aware investigation')
+    if TARGET in auto_text or '100/100' in auto_text:
+        failures.append('Automatic workflow exposes IDs or invents a grade')
+    sent = [call for call in context.send.call_args_list if call.args[0] == TARGET]
+    if len(sent) != 1 or not all(label in sent[0].args[1].text() for label in ('A. ', 'B. ', 'C. ')):
+        failures.append('Automatic workflow did not send exactly one three-check suite')
     return latencies, failures
 
 

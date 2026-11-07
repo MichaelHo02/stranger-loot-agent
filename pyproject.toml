@@ -1,7 +1,7 @@
 [project]
 name = "stranger-loot-agent"
 version = "0.3.0"
-description = "Discover Fetch.ai projects and run confirmed Chat Protocol tests with evidence and assertion scores."
+description = "Investigate ASI projects through public research, dated challenge guidance and automatic chat-only checks with evidence reports."
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [

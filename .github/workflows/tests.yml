@@ -23,6 +23,9 @@ jobs:
       - name: Discovery correctness (fixtures)
         if: ${{ !cancelled() }}
         run: python evals/run.py --mode fixture
+      - name: Stranger Builds rules question exercise
+        if: ${{ !cancelled() }}
+        run: python evals/rules_eval.py
       - name: Realistic scenarios and handler performance
         if: ${{ !cancelled() }}
         run: python evals/performance.py --repeats 20 --budget-ms 250

@@ -77,3 +77,9 @@ Run locally:
 ```
 
 Scenario requirements live in `evals/scenarios.json`. All 120 repetitions must satisfy their requirements; measured p50/p95 values are observations on that runner, not a load test or hosted speed guarantee. Synthetic target responses validate reporting only, not an actual target's competence. This automation does **not** verify hosted Agentverse delivery or visible ASI replies. Keep the existing visible ASI gate separate; green CI does not imply readiness.
+
+The six scenario benchmarks also exercise automatic unique-match investigation, rules provenance and the three-check outbound request. Each repetition measures four local owner turns across the manual and automatic flows.
+
+## Stranger Builds question exercise
+
+Run `.venv/bin/python evals/rules_eval.py` for 12 curated questions covering job requirements, new repos/forks, counted hires, automated/owner trials, pending feedback, judging, deadline uncertainty, optional payments, team size and unknown prizes. Expected statements, prohibited claims and source provenance are checked. Every push runs this exercise and uploads `rules.json` / `rules.md`. Separate regression cases cover prompt injection and ensuring rules questions do not contact a target or search the catalogue. These are deterministic topic-based answers against the plugin snapshot, not a general-language reasoning evaluation or live rule verification.

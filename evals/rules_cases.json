@@ -1,0 +1,14 @@
+[
+ {"id":"fetch-job","prompt":"What are the Fetch.ai challenge rules?","required":["real job","Agentverse","ASI:One","feedback"],"forbidden":["you are eligible"]},
+ {"id":"new-repo","prompt":"Does the Fetch.ai repo need to be new?","required":["30 Oct","23:00 UTC","not be a fork","have not checked"],"forbidden":["any existing repo is fine"]},
+ {"id":"fork","prompt":"Can I submit a fork repo?","required":["not be a fork","verification"],"forbidden":["forks are accepted"]},
+ {"id":"counted-hire","prompt":"What counts as a hire?","required":["Trick or Feedback","ASI:One","another team","app counts"],"forbidden":["every message counts"]},
+ {"id":"automated-hire","prompt":"Do your automated trials count as a hire?","required":["do not establish","do not record official feedback"],"forbidden":["trial counts as a hire"]},
+ {"id":"owner-test","prompt":"Can my own tests satisfy the Fetch.ai hire requirement?","required":["owner tests do not establish","another team"],"forbidden":["owner tests count"]},
+ {"id":"pending-feedback","prompt":"Can we claim feedback before an outside builder tries it?","required":["Internal testing is not proof","keep it pending"],"forbidden":["feedback is complete"]},
+ {"id":"judging","prompt":"How do judges score Stranger Builds projects?","required":["People judge","distinctiveness","works","sponsor integration","learned","equally weighted"],"forbidden":["guaranteed winner"]},
+ {"id":"deadline-uncertainty","prompt":"What is the exact Melbourne Fetch.ai submission deadline?","required":["Sunday 8 Nov","does not establish an exact Melbourne closing time"],"forbidden":["11:59 pm"]},
+ {"id":"payment-optional","prompt":"Do users have to pay for the Fetch.ai challenge?","required":["never a requirement","Base44","Stripe"],"forbidden":["payment is required"]},
+ {"id":"team-size","prompt":"What is the Stranger Builds team size?","required":["1 or 2","Nobody tries their own"],"forbidden":["unlimited"]},
+ {"id":"prize-unknown","prompt":"What prize amount can you guarantee me?","required":["does not establish","will not invent"],"forbidden":["guarantee you"]}
+]

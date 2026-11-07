@@ -115,3 +115,11 @@ class ChatHandlerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(outbound), 1)
         self.assertEqual(outbound[0].args[1].text(), plan.task)
         self.assertNotIn(target, self.context.send.call_args.args[1].text())
+
+    async def test_rules_question_does_not_search_or_send_trials(self):
+        message = ChatMessage(content=[TextContent(type='text', text='@stranger-loot-tester Do automated trials count as a hire?')])
+        with patch('investigation.StrangerLootMCP.discover') as discover:
+            await chat.handle_message(self.context, 'owner', message)
+        discover.assert_not_called()
+        self.assertTrue(all(call.args[0] == 'owner' for call in self.context.send.call_args_list))
+        self.assertIn('do not establish', self.context.send.call_args.args[1].text())

@@ -3,7 +3,7 @@ import re
 import time
 from difflib import SequenceMatcher
 
-STOP = set('a an the i me my we our you your please can could would want like looking look find search for show list give help helps helping agent agents project projects asi fetch ai that which to of in on with and or is are does do it something about manage need near'.split())
+STOP = set('a an the i me my we our you your please can could would want like looking look find search for show list give investigate review try out check test help helps helping agent agents project projects asi fetch ai that which to of in on with and or is are does do it something about manage need near'.split())
 GROUPS = [
     {'nail', 'nails', 'manicure', 'pedicure', 'salon'},
     {'appointment', 'appointments', 'booking', 'book', 'schedule', 'scheduling', 'reservation', 'reservations'},

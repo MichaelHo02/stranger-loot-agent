@@ -16,10 +16,12 @@ class WorkflowState:
         self.runner.routes = {tuple(key): value for key, value in data.get('routes', [])}
         self.runner.seen = {tuple(key): value for key, value in data.get('seen', [])}
         self.shortlists.results = {tuple(key): value for key, value in data.get('shortlists', [])}
+        self.choices = {tuple(key): value for key, value in data.get('choices', [])}
         self.runner.prune()
 
     def save(self):
         self.storage.set(KEY, {
+            'choices': [[list(key), value] for key, value in self.choices.items()],
             'plans': [[list(key), asdict(value)] for key, value in self.runner.plans.items()],
             'routes': [[list(key), value] for key, value in self.runner.routes.items()],
             'seen': [[list(key), value] for key, value in self.runner.seen.items()],

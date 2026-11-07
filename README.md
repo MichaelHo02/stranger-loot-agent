@@ -1,10 +1,16 @@
 # Stranger Loot Tester
 
-Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-message Chat Protocol test of another agent. Suggested scenarios produce an evidence report and a review checklist. They do not assign an automatic quality score.
+Investigate ASI/Agentverse projects: describe what to explore and the agent researches public details, applies available challenge guidance, runs chat-only checks and returns an evidence report. Suggested scenarios produce an evidence report and a review checklist. They do not assign an automatic quality score.
 
-## Features
+## Automatic investigation
 
-- Describe an agent, such as `find a nail appointment agent`, `find a clinical trials agent`, or `an agent that helps with my money`. The agent searches Stranger Loot MCP and returns up to five ASI/Agentverse candidates.
+Say `investigate a clinical trials agent` (ordinary descriptions also work). A unique project match starts three chat-only checks in one request: a realistic task, clarification and limitations. Only ambiguous project matches require a choice. A reply produces evidence and a review checklist; no automatic quality score is assigned. `status` checks progress or produces a timeout report after 60 seconds. Rules come from a dated Stranger Builds plugin snapshot, not a live plugin connection. No official feedback or counted hire is claimed. See [workflow, limits and rules access](docs/AUTOMATIC_INVESTIGATION.md).
+
+Ask event questions such as `What counts as a hire?` or `Does the Fetch.ai repo need to be new?`. Answers cite the bundled public rules snapshot and disclose unknowns; they do not create feedback or certify eligibility.
+
+## Manual controls
+
+- Describe an agent, such as `find a nail appointment agent`, `find a clinical trials agent`, or `an agent that helps with my money`. The agent searches Stranger Loot MCP internally; one match starts investigation and multiple matches ask for clarification.
 - `projects` or `projects <search words>` also searches the same public catalogue.
 - Choose a candidate with `test 1`. Supported service categories receive a realistic fictional scenario and review checklist; unknown services ask for your task instead of inventing one. Plans and reports use the catalogue name.
 - Custom checks remain available: `test 1 | <fictional task> | <expected text>`.
@@ -28,7 +34,7 @@ Custom expected-text checks report **PASS** or **FAIL** for that phrase only, wi
 
 ## Limitations
 
-Only ASI/Agentverse chat agents are test targets. There is no website/browser testing, purchasing, payment integration, automatic benchmark suite, or report saving. Only the first text response is assessed; multi-message/streamed answers may be incomplete.
+Only ASI/Agentverse chat agents are test targets. There is no website/browser testing, purchasing, payment integration, independent multi-turn benchmark suite, or external report saving. Only the first text response is assessed; multi-message/streamed answers may be incomplete.
 
 Discovery reads the `current` public catalogue exposed by Stranger Loot MCP. It searches detailed `free` entries, which may cover only part of the indexed directory; each response states its coverage and update time. It never uses locked/rest entries. Matching uses keywords, a small related-term vocabulary and typo tolerance, not general semantic or LLM ranking. A vague description can have no match.
 

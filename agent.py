@@ -15,6 +15,8 @@ from mcp_client import reply_to_command
 from discovery import normalize_user_text
 from workflow_state import WorkflowState
 from test_runner import PENDING
+from investigation import investigate
+from rules_questions import answer_rules_question
 
 
 agent = Agent()
@@ -63,6 +65,14 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         return PENDING
 
     try:
+        reply = answer_rules_question(text)
+        if reply is None:
+            reply = await investigate(state, sender, ctx.session, text, ctx.agent.address, exchange)
+        if reply is not None:
+            state.save()
+            await ctx.send(sender, ChatMessage(timestamp=datetime.now(timezone.utc), msg_id=uuid4(),
+                content=[TextContent(type="text", text=reply), EndSessionContent(type="end-session")]))
+            return
         try:
             resolved = shortlists.resolve(sender, ctx.session, text)
         except ValueError as error:

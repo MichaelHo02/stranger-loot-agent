@@ -127,7 +127,9 @@ def reply_to_command(text, shortlists=None, owner=None, session=None):
         if shortlists is not None and not shortlists.save(owner, session, matches):
             return 'Discovery is at capacity. Please try again later.'
         return reply
-    return ('I find Fetch.ai projects and test Agentverse agents through chat. '
-            'Describe what you need, such as "find a nail appointment agent". Choose a shortlist number to test: '
-            '**test 1**. I will suggest a realistic scenario and show the message first; reply **start** when you are ready. '
-            'No websites or payments. Send mcp tools to check the catalogue connection.')
+    return ('I investigate ASI projects for hackathon builders. Tell me what to explore, such as '
+            '“investigate a clinical trials agent”. I research the public details, use the available challenge rules, '
+            'and run three chat-only checks. I ask only if several projects match. '
+            'You receive the quoted reply and review criteria, or a clear blocked result. '
+            'Send status while waiting. No purchases, votes or official feedback. '
+            'Rules currently use a dated Stranger Builds snapshot. Send projects to browse without testing.')

@@ -8,7 +8,7 @@ class PerformanceGateTests(unittest.IsolatedAsyncioTestCase):
         results = await evaluate(1, 250)
         self.assertEqual(len(results), 6)
         self.assertTrue(all(result['status'] == 'pass' for result in results), results)
-        self.assertTrue(all(result['turns_measured'] == 3 for result in results))
+        self.assertTrue(all(result['turns_measured'] == 4 for result in results))
 
     async def test_latency_regression_fails_gate(self):
         async def slow(*args):
