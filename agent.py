@@ -12,8 +12,10 @@ from uagents_core.contrib.protocols.chat import (
 
 from mcp_client import reply_to_command
 from test_runner import TestRunner
+from discovery import Shortlists
 
 runner = TestRunner()
+shortlists = Shortlists()
 
 agent = Agent()
 
@@ -53,9 +55,15 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         return response.text()
 
     try:
-        reply = await runner.command(sender, ctx.session, text, ctx.agent.address, exchange)
+        try:
+            resolved = shortlists.resolve(sender, ctx.session, text)
+        except ValueError as error:
+            resolved = None
+            reply = str(error)
+        if resolved is not None:
+            reply = await runner.command(sender, ctx.session, resolved, ctx.agent.address, exchange)
         if reply is None:
-            reply = await asyncio.to_thread(reply_to_command, text)
+            reply = await asyncio.to_thread(reply_to_command, text, shortlists, sender, ctx.session)
     except Exception:
         reply = "Stranger Loot MCP is unavailable right now. Please try again later."
     content = [TextContent(type="text", text=reply)]

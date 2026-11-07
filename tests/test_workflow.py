@@ -1,6 +1,7 @@
 import asyncio
 import unittest
 from test_runner import TestRunner
+from discovery import Shortlists
 
 TARGET = 'agent1' + 'q' * 59
 OWNER = 'agent1' + 'p' * 59
@@ -108,3 +109,14 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
             return '42'
         await asyncio.gather(self.confirm(slow), self.confirm(slow))
         self.assertEqual(len(self.calls), 1)
+
+    async def test_shortlist_selection_creates_plan_and_later_search_cannot_change_it(self):
+        lists = Shortlists()
+        lists.save(OWNER, 'session', [{'target_address': TARGET}])
+        command = lists.resolve(OWNER, 'session', 'test 1 | What is 6 * 7? | 42')
+        result = await self.runner.command(OWNER, 'session', command, SELF, self.exchange)
+        self.assertIn('Test plan', result)
+        self.assertEqual(self.calls, [])
+        lists.save(OWNER, 'session', [{'target_address': 'agent1' + 'x' * 59}])
+        await self.confirm()
+        self.assertEqual(self.calls, [(TARGET, 'What is 6 * 7?')])

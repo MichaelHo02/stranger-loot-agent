@@ -4,6 +4,7 @@ import os
 from urllib.request import Request, urlopen
 from urllib.parse import urlparse
 from test_runner import agent_address
+from discovery import rank_projects, search_description
 
 DEFAULT_URL = 'https://stranger-loot.base44.app/api/mcp'
 MAX_BYTES = 4 * 1024 * 1024
@@ -65,49 +66,68 @@ class StrangerLootMCP:
         return {tool['name']: tool for tool in tools if tool['name'] == 'query_publiccatalogue'
                 and tool.get('annotations', {}).get('readOnlyHint') is True}
 
-    def projects(self, search=''):
+    def discover(self, search=''):
         if 'query_publiccatalogue' not in self.connect():
             raise MCPError('The public catalogue tool is unavailable.')
         result = self.request('tools/call', {'name': 'query_publiccatalogue', 'arguments': {
-            'query': {'key': 'community-feeds'}, 'limit': 1, 'fields': ['key', 'snapshot']}})
+            'query': {'key': 'current'}, 'limit': 1, 'fields': ['key', 'snapshot']}})
         if result.get('isError'):
             raise MCPError('The public catalogue query failed.')
         data = result.get('structuredContent')
         if data is None:
             data = json.loads(next(part['text'] for part in result.get('content', []) if part.get('type') == 'text'))
         records = data.get('records', [])
-        gallery = records[0].get('snapshot', {}).get('gallery', {}).get('data', {}) if records else {}
-        snapshot_items = gallery.get('items', [])
+        snapshot = records[0].get('snapshot', {}) if records else {}
+        # Only explicitly public detailed entries; never use locked/rest data.
+        detailed = snapshot.get('free', [])
         items = []
-        for item in snapshot_items:
-            links = [item.get('public_url'), item.get('url'),
-                     (item.get('try_cta') or {}).get('url'), item.get('agent_address')]
+        for item in detailed:
+            links = [item.get('public_url'), item.get('try_url'), item.get('agent_address')]
             address = next((agent_address(link) for link in links if isinstance(link, str) and agent_address(link)), None)
-            if address:
-                items.append(dict(item, target_address=address))
-        needle = search.casefold()
-        matches = [item for item in items if needle in (str(item.get('name', '')) + ' ' + str(item.get('one_liner', ''))).casefold()]
-        lines = ['ASI/Agentverse projects in Stranger Loot (snapshot: %s)' % gallery.get('as_of', 'unknown')]
-        lines.append('This snapshot contains %s of %s projects; discovery may be incomplete.' %
-                     (len(snapshot_items), gallery.get('total', len(snapshot_items))))
-        for item in matches[:5]:
-            lines.append('%s: %s\nAgent: %s\n%s' % (str(item.get('name') or '')[:100], str(item.get('one_liner') or '')[:350], item['target_address'], str(item.get('url') or '')[:300]))
+            asi_link = next((link for link in links if isinstance(link, str)
+                            and urlparse(link).scheme == 'https'
+                            and urlparse(link).hostname in {'asi1.ai', 'agentverse.ai'}), None)
+            if address or asi_link:
+                items.append(dict(item, target_address=address, agent_link=asi_link))
+        matches = rank_projects(items, search)
+        lines = ['ASI/Agentverse shortlist from Stranger Loot MCP (updated: %s)' %
+                 (snapshot.get('lastSync') or {}).get('at', 'unknown')]
+        lines.append('%s detailed public projects searched; %s total indexed. Some descriptions or agent links may be unavailable.' %
+                     (len(detailed), snapshot.get('total', len(detailed))))
+        for index, item in enumerate(matches, 1):
+            lines.append('%s. %s: %s\n%s\n%s' % (
+                index, str(item.get('name') or '')[:100], str(item.get('one_liner') or '')[:350],
+                str(item.get('agent_link') or item.get('source_url') or '')[:600],
+                'Ready for a confirmed chat test.' if item.get('target_address') else
+                'ASI link found; agent address not published here, so testing is unavailable.'))
         if not matches:
-            lines.append('No matching ASI/Agentverse addresses in this snapshot. Supply an agent1 address or ASI/Agentverse profile link to test an agent directly.')
-        lines.append('Catalogue descriptions are unverified claims, not hands-on test results.')
-        return '\n\n'.join(lines)
+            lines.append('No matching ASI/Agentverse candidates in the available public details. Try different words. This is not proof that no such agent exists.')
+        elif any(item.get('target_address') for item in matches):
+            ready_index = next(index for index, item in enumerate(matches, 1) if item.get('target_address'))
+            lines.append('Choose a ready result, for example: test %s | <fictional task> | <expected text>. I will show a plan for confirmation before sending anything.' % ready_index)
+        else:
+            lines.append('Candidate profiles are available above. Automatic testing needs a published Chat Protocol agent address; no address will be guessed.')
+        lines.append('Matches use keywords, related terms and typo tolerance. Descriptions are unverified claims; no agent has been tested by this search.')
+        return '\n\n'.join(lines), matches
+
+    def projects(self, search=''):
+        return self.discover(search)[0]
 
 
-def reply_to_command(text):
+def reply_to_command(text, shortlists=None, owner=None, session=None):
     text = text.strip()
     if len(text) > 500:
         return 'Please keep your request under 500 characters.'
     if text.casefold() == 'mcp tools':
         tools = StrangerLootMCP().connect()
         return 'Connected to Stranger Loot MCP. Enabled read-only tools: ' + (', '.join(tools) or 'none')
-    if text.casefold() == 'projects' or text.casefold().startswith('projects '):
-        return StrangerLootMCP().projects(text[8:].strip())
+    query = search_description(text)
+    if query is not None:
+        reply, matches = StrangerLootMCP().discover(query)
+        if shortlists is not None and not shortlists.save(owner, session, matches):
+            return 'Discovery is at capacity. Please try again later.'
+        return reply
     return ('I find Fetch.ai projects and test Agentverse agents through chat. '
-            'Send projects or projects <search words>. To test, supply the target agent1 address: '
-            'test <address> | <fictional task> | <expected text>. I show a plan before you confirm. '
+            'Describe what you need, such as "find a nail appointment agent". Choose a shortlist number to test: '
+            'test 1 | <fictional task> | <expected text>. I show a plan before you confirm. '
             'No websites or payments. Send mcp tools to check the catalogue connection.')

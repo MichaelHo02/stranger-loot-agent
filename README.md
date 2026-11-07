@@ -4,7 +4,9 @@ Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-messag
 
 ## Features
 
-- `projects` or `projects <search words>`: find projects with an explicit ASI/Agentverse address in the public MCP snapshot.
+- Describe an agent, such as `find a nail appointment agent`, `find a clinical trials agent`, or `an agent that helps with my money`. The agent searches Stranger Loot MCP and returns up to five ASI/Agentverse candidates.
+- `projects` or `projects <search words>` also searches the same public catalogue.
+- Choose a candidate with `test 1 | <fictional task> | <expected text>`. The number is resolved from your latest shortlist in this chat; there is no need to copy an agent address.
 - `test <agent1 address or ASI/Agentverse profile link> | <fictional task> | <expected text>`: prepare a test plan.
 - `confirm <plan token>`: send the exact task once, wait up to 60 seconds, and report the observed text and timing.
 - `cancel`: discard a pending plan without sending a test.
@@ -26,7 +28,9 @@ This is one text-containment assertion. A response that merely echoes the expect
 
 Only ASI/Agentverse chat agents are test targets. There is no website/browser testing, purchasing, payment integration, automatic benchmark suite, or report saving. Only the first text response is assessed; multi-message/streamed answers may be incomplete.
 
-Discovery reads the `community-feeds` gallery snapshot exposed by Stranger Loot MCP. It may cover only part of the directory and omits projects without a published agent address. A Fetch.ai challenge entry alone does not establish that an agent exists. Supply an address or profile link directly when needed. No agent has been independently rated by this implementation yet.
+Discovery reads the `current` public catalogue exposed by Stranger Loot MCP. It searches detailed `free` entries, which may cover only part of the indexed directory; each response states its coverage and update time. It never uses locked/rest entries. Matching uses keywords, a small related-term vocabulary and typo tolerance, not general semantic or LLM ranking. A vague description can have no match.
+
+Candidates need a published ASI/Agentverse link. A handle-only ASI link can appear in the shortlist, but cannot be tested until its actual Chat Protocol address is published; no address is guessed. Numbered choices expire after five minutes and are isolated by sender and chat session. Choosing a result only creates a plan; it never sends a test before confirmation. A new search does not alter an already prepared plan. Direct addresses and profile links remain supported.
 
 One test is allowed per chat session during a 15-minute in-memory retention window, preventing reuse of a response session for a second test. Start a new chat for another run. State and duplicate suppression reset on restart. Maximum 100 retained plans and 2000 recent incoming message identifiers per process.
 
@@ -34,7 +38,7 @@ One test is allowed per chat session during a 15-minute in-memory retention wind
 
 Default: https://stranger-loot.base44.app/api/mcp
 
-Optionally override `STRANGER_LOOT_MCP_URL` with a trusted HTTPS endpoint in Agentverse environment configuration. No credentials are needed for the current public server. The client initializes MCP, discovers tools, and only calls the reviewed `query_publiccatalogue` tool with its read-only annotation. Payment, contact, recovery, and private entity tools are excluded.
+Optionally override `STRANGER_LOOT_MCP_URL` with a trusted HTTPS endpoint in Agentverse environment configuration. No credentials are needed for the current public server. See [the MCP access review](docs/MCP_ACCESS_REVIEW.md) for verified anonymous visibility and access limits. The client initializes MCP, discovers tools, and only calls the reviewed `query_publiccatalogue` tool with its read-only annotation. Payment, contact, recovery, and private entity tools are excluded.
 
 ## Development and automated verification
 
