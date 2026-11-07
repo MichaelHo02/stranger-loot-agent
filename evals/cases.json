@@ -1,0 +1,85 @@
+[
+  {
+    "id": "clinical-direct",
+    "prompt": "Find a clinical trials agent",
+    "expected_slug": "trialfinder",
+    "require_address": true,
+    "expected_name": "TrialFinder"
+  },
+  {
+    "id": "clinical-mention",
+    "prompt": "@stranger-loot-tester Find a clinical trials agent",
+    "expected_slug": "trialfinder",
+    "require_address": true,
+    "expected_name": "TrialFinder"
+  },
+  {
+    "id": "clinical-typo",
+    "prompt": "Find a clincal trials agent",
+    "expected_slug": "trialfinder",
+    "require_address": true,
+    "expected_name": "TrialFinder"
+  },
+  {
+    "id": "clinical-paraphrase",
+    "prompt": "I need an agent to find medical studies near me",
+    "expected_slug": "trialfinder",
+    "require_address": true,
+    "expected_name": "TrialFinder"
+  },
+  {
+    "id": "finance-direct",
+    "prompt": "An agent that helps with my money",
+    "expected_slug": "tradejack",
+    "expected_name": "TradeJack"
+  },
+  {
+    "id": "finance-paraphrase",
+    "prompt": "I need help with finances",
+    "expected_slug": "tradejack",
+    "expected_name": "TradeJack"
+  },
+  {
+    "id": "friends-direct",
+    "prompt": "Find an agent for friends",
+    "expected_slug": "mori",
+    "expected_name": "Mori Together"
+  },
+  {
+    "id": "friends-paraphrase",
+    "prompt": "Help two friends plan a meetup",
+    "expected_slug": "mori",
+    "expected_name": "Mori Together"
+  },
+  {
+    "id": "impossible-request",
+    "prompt": "Find an agent that teleports Jupiter into my bedroom",
+    "expect_empty": true
+  },
+  {
+    "id": "ambiguous-request",
+    "prompt": "Find an agent",
+    "minimum_results": 2
+  },
+  {
+    "id": "clinical-study-variant",
+    "prompt": "Find a clinical study agent",
+    "expected_name": "TrialFinder",
+    "require_address": true
+  },
+  {
+    "id": "finance-budget-variant",
+    "prompt": "Could you find a budgeting agent?",
+    "expected_name": "TradeJack"
+  },
+  {
+    "id": "friends-social-variant",
+    "prompt": "Find a social meetup agent",
+    "expected_name": "Mori Together"
+  },
+  {
+    "id": "nail-website-exclusion",
+    "prompt": "Find a nail appointment agent",
+    "expect_empty": true
+  }
+]

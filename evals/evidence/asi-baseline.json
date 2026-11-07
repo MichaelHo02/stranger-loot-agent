@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "asi-clinical-discovery",
+      "prompt": "Find a clinical trials agent",
+      "observer": "cua_visible_ui",
+      "sent_at": "2026-11-07T08:39:55.667Z",
+      "checked_at": "2026-11-07T08:40:57.797Z",
+      "observed_after_seconds": 62.13,
+      "visible_reply_seconds": null,
+      "visible_reply_text": null,
+      "required_terms": [
+        "TrialFinder"
+      ],
+      "evidence_file": "/private/tmp/asi-eval-baseline.png",
+      "host_inbound_at": "2026-11-07T08:39:56.924Z",
+      "host_reply_logged_at": "2026-11-07T08:39:59.197Z",
+      "note": "Fresh profile-initiated ASI chat. No visible reply at the 42.67-second observation or final screenshot. Host envelope logs do not satisfy the visible-reply gate."
+    }
+  ],
+  "deployed_commit": "74b12e74a5c1a3d084196039c7829863deb9862c"
+}

@@ -3,13 +3,14 @@ import re
 import time
 from difflib import SequenceMatcher
 
-STOP = set('a an the i me my we our you your please can could would want like looking look find search for show list give help helps helping agent agents project projects asi fetch ai that which to of in on with and or is are does do it something about manage'.split())
+STOP = set('a an the i me my we our you your please can could would want like looking look find search for show list give help helps helping agent agents project projects asi fetch ai that which to of in on with and or is are does do it something about manage need near'.split())
 GROUPS = [
     {'nail', 'nails', 'manicure', 'pedicure', 'salon'},
     {'appointment', 'appointments', 'booking', 'book', 'schedule', 'scheduling', 'reservation', 'reservations'},
     {'money', 'finance', 'financial', 'budget', 'budgeting', 'expense', 'expenses'},
     {'travel', 'trip', 'trips', 'holiday', 'vacation'},
-    {'friend', 'friends', 'social', 'hangout', 'together'},
+    {'friend', 'friends', 'social', 'hangout', 'together', 'meetup'},
+    {'study', 'studies', 'trial', 'trials', 'research'},
     {'medical', 'health', 'healthcare', 'clinical', 'patient', 'patients'},
 ]
 

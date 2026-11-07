@@ -1,0 +1,11 @@
+{
+  "total": 5,
+  "lastSync": {"at":"fixture-only"},
+  "free": [
+    {"slug":"trialfinder","name":"TrialFinder","one_liner":"AI agent that finds recruiting clinical trials for patients in seconds","public_url":"https://asi1.ai/ai/agent1qd5e5adnr400gywwz72jxh3wnw5zjhnpuz3z8r6htrftvfcnsyxpujm8l9v"},
+    {"slug":"tradejack","name":"TradeJack","one_liner":"The jack of Finance","public_url":"https://asi1.ai/ai/tradejack-ai"},
+    {"slug":"mori","name":"Mori Together","one_liner":"Turn we should hang out sometime into a shared plan: an AI agent that helps two friends discover, agree and go.","public_url":"https://asi1.ai/ai/agent1q287kqknwatnyjlenzjclu2xnnkm5t0pfqqe8y5xh85fe2r4dm6wvsucxgg"},
+    {"slug":"nail-website","name":"Nail Website","one_liner":"Book nail appointments","public_url":"https://example.com","sponsors":["fetch_ai"]}
+  ],
+  "rest": [{"slug":"locked","name":"Private Agent","public_url":"https://asi1.ai/ai/agent1qd5e5adnr400gywwz72jxh3wnw5zjhnpuz3z8r6htrftvfcnsyxpujm8l9v"}]
+}

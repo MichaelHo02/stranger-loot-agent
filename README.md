@@ -43,6 +43,8 @@ Optionally override `STRANGER_LOOT_MCP_URL` with a trusted HTTPS endpoint in Age
 
 ## Development and automated verification
 
+See [outcome evaluations](evals/README.md) for repeatable fixture, live MCP and visible ASI checks. Passing unit tests alone does not establish that the agent works in ASI. The readiness gate currently fails the recorded ASI delivery baseline.
+
 Python 3.10–3.12; uAgents 0.26.1 or later. Run:
 
 ```sh
