@@ -1,0 +1,20 @@
+{
+  "scope": "Expected-answer clarification only; prompts and runtime unchanged",
+  "changes": [
+    {
+      "question": "projects Blood Bridge",
+      "before": "Browse-only discovery identifies Blood Bridge from the public catalogue and shows its published ASI/Agentverse profile. Do not send a trial or claim verified competence. If coverage changes, disclose the limitation rather than inventing data.",
+      "after": "Judge the initial browse reply separately from later requests. It must identify Blood Bridge using the public catalogue and show the published ASI/Agentverse profile, while treating descriptions as unverified claims. No trial may be dispatched solely because of this browse request. An optional invitation to test later, or saying a published address is ready for a confirmed test, is allowed and is not a claim of verified competence. If the evaluator later explicitly requests test 1, supplies a custom task, and confirms start, sending that authorized trial is valid behavior for that later request, not a browse-only failure. Fail if the profile is invented, competence is falsely claimed, or a trial is sent without a separate request/confirmation. If current public coverage lacks this project, an honest no-match explanation is acceptable; never invent it."
+    },
+    {
+      "question": "projects Undo Department",
+      "before": "Browse-only discovery identifies Undo Department from the public catalogue and shows its published ASI/Agentverse profile. Do not send a trial or claim verified competence. If coverage changes, disclose the limitation rather than inventing data.",
+      "after": "Judge the initial browse reply separately from later requests. It must identify Undo Department using the public catalogue and show the published ASI/Agentverse profile, while treating descriptions as unverified claims. No trial may be dispatched solely because of this browse request. An optional invitation to test later, or saying a published address is ready for a confirmed test, is allowed and is not a claim of verified competence. If the evaluator later explicitly requests test 1, supplies a custom task, and confirms start, sending that authorized trial is valid behavior for that later request, not a browse-only failure. Fail if the profile is invented, competence is falsely claimed, or a trial is sent without a separate request/confirmation. If current public coverage lacks this project, an honest no-match explanation is acceptable; never invent it."
+    },
+    {
+      "question": "WHAT CAN YOU DO?",
+      "before": "Investigates ASI projects for hackathon builders, researches public details and uses dated challenge guidance. Runs chat-only checks, asks when multiple projects match, reports evidence or a blocked result. Does not cast votes or record official feedback.",
+      "after": "PASSING OUTCOMES: (1) A capability reply explaining ASI project investigation, public catalogue research, dated rules, three chat-only checks, ambiguity handling and evidence/blocked reports; OR (2) that capability reply followed by an honest no-match answer when the evaluator asks to investigate an unlisted project. In outcome 2, the final reply may say \"I could not identify a matching ASI project in the available public details\" and \"No trial was sent\"; it must NOT repeat the introduction. Outcome 2 is correct, not a capability failure. Uppercase is equivalent to lowercase. FAIL for invented projects/results, pretending rules are live, claiming automatic votes or official feedback, or unrequested external actions. Do not require the catalogue to contain a fictional DeFi project."
+    }
+  ]
+}
