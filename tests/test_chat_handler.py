@@ -56,7 +56,7 @@ class ChatHandlerTests(unittest.IsolatedAsyncioTestCase):
         await chat.handle_message(self.context, 'owner', message)
         response = self.context.send.call_args_list[-1].args[1]
         self.assertIn('Test plan', response.text())
-        self.assertIn('confirm ', response.text())
+        self.assertIn('Reply “start”', response.text())
         self.assertTrue(all(call.args[0] == 'owner' for call in self.context.send.call_args_list))
 
     async def test_new_runtime_restores_plan_and_prevents_confirmation_replay(self):
@@ -75,7 +75,7 @@ class ChatHandlerTests(unittest.IsolatedAsyncioTestCase):
             return 'pong'
         result = await second.runner.command('owner', self.context.session, 'confirm ' + token, self.context.agent.address, exchange)
         second.save()
-        self.assertIn('100/100', result)
+        self.assertIn('PASS —', result)
         third = WorkflowState(self.context.storage)
         self.assertIn('No matching', await third.runner.command('owner', self.context.session, 'confirm ' + token, self.context.agent.address, AsyncMock()))
 
@@ -89,4 +89,29 @@ class ChatHandlerTests(unittest.IsolatedAsyncioTestCase):
         message = ChatMessage(content=[TextContent(type='text', text='pong')])
         await chat.handle_message(self.context, target, message)
         self.assertEqual(self.context.send.call_args.args[0], 'owner')
-        self.assertIn('100/100', self.context.send.call_args.args[1].text())
+        self.assertIn('PASS —', self.context.send.call_args.args[1].text())
+
+    async def test_bare_selection_keeps_name_and_scenario_across_hosted_restarts(self):
+        target = 'agent1' + 'q' * 59
+        state = WorkflowState(self.context.storage)
+        state.shortlists.save('owner', self.context.session, [
+            {'target_address': target, 'name': 'TrialFinder', 'one_liner': 'Find recruiting clinical trials'}])
+        state.save()
+        await chat.handle_message(self.context, 'owner', ChatMessage(
+            content=[TextContent(type='text', text='@stranger-loot-tester test 1')]))
+        plan_text = self.context.send.call_args.args[1].text()
+        self.assertIn('Test plan for TrialFinder', plan_text)
+        self.assertIn('type 2 diabetes', plan_text)
+        self.assertNotIn(target, plan_text)
+        self.assertTrue(all(call.args[0] == 'owner' for call in self.context.send.call_args_list))
+        restored = WorkflowState(self.context.storage)
+        plan = restored.runner.plans[('owner', str(self.context.session))]
+        self.assertEqual(plan.name, 'TrialFinder')
+        self.assertTrue(plan.rubric)
+        self.context.send.reset_mock()
+        await chat.handle_message(self.context, 'owner', ChatMessage(
+            content=[TextContent(type='text', text='@stranger-loot-tester start')]))
+        outbound = [call for call in self.context.send.call_args_list if call.args[0] == target]
+        self.assertEqual(len(outbound), 1)
+        self.assertEqual(outbound[0].args[1].text(), plan.task)
+        self.assertNotIn(target, self.context.send.call_args.args[1].text())

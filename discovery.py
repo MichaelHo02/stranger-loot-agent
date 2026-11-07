@@ -68,7 +68,8 @@ class Shortlists:
         if key not in self.results and len(self.results) >= 100:
             return False
         self.results[key] = (now, [
-            {'target_address': item.get('target_address'), 'name': str(item.get('name') or '')[:100]}
+            {'target_address': item.get('target_address'), 'name': str(item.get('name') or '')[:100],
+             'one_liner': str(item.get('one_liner') or '')[:350]}
             for item in matches[:5]
         ])
         return True
@@ -92,6 +93,13 @@ class Shortlists:
         return 'test ' + item['target_address'] + (' | ' + rest.strip() if separator else '')
 
 
+    def candidate(self, owner, session, address):
+        result = self.results.get((owner, str(session)))
+        if result and self.clock() - result[0] < 300:
+            return next((item for item in result[1] if item.get('target_address') == address), None)
+        return None
+
+
 def search_description(text):
     stripped = text.strip()
     lower = stripped.casefold()
@@ -100,6 +108,6 @@ def search_description(text):
             return ''
         if lower.startswith(prefix + ' '):
             return stripped[len(prefix):].strip()
-    if lower not in {'help', 'hello', 'hi', 'what can you do?', 'mcp tools'} and not lower.startswith(('test ', 'confirm ', 'cancel')):
+    if lower not in {'help', 'hello', 'hi', 'what can you do?', 'mcp tools', 'start', 'yes', 'confirm', 'status'} and not lower.startswith(('test ', 'confirm ', 'cancel')):
         return stripped
     return None

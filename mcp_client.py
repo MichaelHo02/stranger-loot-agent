@@ -97,14 +97,14 @@ class StrangerLootMCP:
         for index, item in enumerate(matches, 1):
             lines.append('%s. %s: %s\n%s\n%s' % (
                 index, str(item.get('name') or '')[:100], str(item.get('one_liner') or '')[:350],
-                str(item.get('agent_link') or item.get('source_url') or '')[:600],
+                '[View profile](%s)' % str(item.get('agent_link') or item.get('source_url') or '')[:600],
                 'Ready for a confirmed chat test.' if item.get('target_address') else
                 'ASI link found; agent address not published here, so testing is unavailable.'))
         if not matches:
             lines.append('No matching ASI/Agentverse candidates in the available public details. Try different words. This is not proof that no such agent exists.')
         elif any(item.get('target_address') for item in matches):
             ready_index = next(index for index, item in enumerate(matches, 1) if item.get('target_address'))
-            lines.append('Choose a ready result, for example: `test %s | fictional task | expected text`. I will show a plan for confirmation before sending anything.' % ready_index)
+            lines.append('Want to try one? Reply **test %s** and I will suggest a realistic scenario for you to review before sending it.' % ready_index)
         else:
             lines.append('Candidate profiles are available above. Automatic testing needs a published Chat Protocol agent address; no address will be guessed.')
         lines.append('Matches use keywords, related terms and typo tolerance. Descriptions are unverified claims; no agent has been tested by this search.')
@@ -129,5 +129,5 @@ def reply_to_command(text, shortlists=None, owner=None, session=None):
         return reply
     return ('I find Fetch.ai projects and test Agentverse agents through chat. '
             'Describe what you need, such as "find a nail appointment agent". Choose a shortlist number to test: '
-            '`test 1 | fictional task | expected text`. I show a plan before you confirm. '
+            '**test 1**. I will suggest a realistic scenario and show the message first; reply **start** when you are ready. '
             'No websites or payments. Send mcp tools to check the catalogue connection.')

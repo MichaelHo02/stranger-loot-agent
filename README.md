@@ -1,29 +1,30 @@
 # Stranger Loot Tester
 
-Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-message Chat Protocol test of another agent. This first version gives an evidence-backed **assertion score**, not a general quality ranking.
+Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-message Chat Protocol test of another agent. Suggested scenarios produce an evidence report and a review checklist. They do not assign an automatic quality score.
 
 ## Features
 
 - Describe an agent, such as `find a nail appointment agent`, `find a clinical trials agent`, or `an agent that helps with my money`. The agent searches Stranger Loot MCP and returns up to five ASI/Agentverse candidates.
 - `projects` or `projects <search words>` also searches the same public catalogue.
-- Choose a candidate with `test 1 | <fictional task> | <expected text>`. The number is resolved from your latest shortlist in this chat; there is no need to copy an agent address.
+- Choose a candidate with `test 1`. Supported service categories receive a realistic fictional scenario and review checklist; unknown services ask for your task instead of inventing one. Plans and reports use the catalogue name.
+- Custom checks remain available: `test 1 | <fictional task> | <expected text>`.
 - `test <agent1 address or ASI/Agentverse profile link> | <fictional task> | <expected text>`: prepare a test plan.
-- `confirm <plan token>`: send the exact task once. A correlated target reply produces an evidence report.
+- `start` (also `yes` or `confirm`): send the pending task once. Internal identifiers stay out of chat instructions. Legacy `confirm <plan token>` remains supported.
 - `status`: retrieve the report or check a pending test. After its 60-second response window, a status check reports the test as blocked and unscored.
 - `cancel`: discard a pending plan without sending a test.
 - `mcp tools`: check the read-only catalogue connection.
 
-A plan explains its target, exact input, expected substring and scoring before execution. Plans expire after five minutes and can only be confirmed by their creator in the same chat session. Use fictional, non-sensitive inputs and ask the target only for a reply. The target controls its own behavior.
+A plan explains its target, exact input and review criteria before execution. Plans expire after five minutes and can only be confirmed by their creator in the same chat session. Use fictional, non-sensitive inputs and ask the target only for a reply. The target controls its own behavior.
 
 The test uses the Agent Chat Protocol, accepting only a ChatMessage from the target in the matching session. An acknowledgement is not a test result. Target output is displayed as untrusted evidence and never executed as a command. Duplicate incoming messages and recent late target responses are suppressed.
 
-## Scoring
+## Assessment
 
-- **100/100**: the actual response contains the agreed expected text, case-insensitive.
-- **0/100**: a text response arrived but did not contain it.
-- **Blocked, unscored**: no usable reply, transport error, timeout, non-text reply, or more than 6000 characters.
+Suggested scenarios cover clinical trials, nail appointments, budgets, travel, social meetups and beginner study help. These are curated templates chosen using the public catalogue name and description, not a general scenario generator. They request substantive outputs with constraints and prohibit booking/contact/payment where relevant. Clinical examples use fictional profiles and do not establish medical eligibility.
 
-This is one text-containment assertion. A response that merely echoes the expected text can pass. It does not establish factual correctness, safety, consistency, or overall usefulness. No semantic or LLM judging is implemented. Every report includes the exact input, expected text, observed output when usable, elapsed time, and limitations.
+A suggested test reports the exact reply, response time and service-specific review checklist. The checklist is **not automatically judged**: receiving a reply is not a quality pass. There is no numerical quality score.
+
+Custom expected-text checks report **PASS** or **FAIL** for that phrase only, without a 100/100 score. Echoing the phrase can still pass; this does not establish factual correctness, safety, consistency or usefulness. Unusable, oversized or missing replies are blocked and unscored. No semantic or LLM judging is implemented.
 
 ## Limitations
 
@@ -43,7 +44,7 @@ Optionally override `STRANGER_LOOT_MCP_URL` with a trusted HTTPS endpoint in Age
 
 ## Development and automated verification
 
-See [outcome evaluations](evals/README.md) for repeatable fixture, live MCP and visible ASI checks. Passing unit tests alone does not establish that the agent works in ASI. The readiness gate currently fails the recorded ASI delivery baseline.
+See [outcome evaluations](evals/README.md) for repeatable fixture, live MCP and visible ASI checks. Passing unit tests alone does not establish that the agent works in ASI. The historical failed ASI baseline is retained; current verification must be run against the deployed commit.
 
 Python 3.10–3.12; uAgents 0.26.1 or later. Run:
 

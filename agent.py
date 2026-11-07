@@ -69,7 +69,9 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
             resolved = None
             reply = str(error)
         if resolved is not None:
-            reply = await runner.command(sender, ctx.session, resolved, ctx.agent.address, exchange)
+            reply = await runner.command(sender, ctx.session, resolved, ctx.agent.address, exchange,
+                                         candidate=shortlists.candidate(sender, ctx.session, resolved[5:].split('|')[0].strip())
+                                         if resolved.lower().startswith('test ') else None)
         if reply is None:
             reply = await asyncio.to_thread(reply_to_command, text, shortlists, sender, ctx.session)
     except Exception:
