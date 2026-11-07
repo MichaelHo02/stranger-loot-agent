@@ -171,6 +171,8 @@ class TestRunner:
         return None
 
     def finish(self, plan, reply):
+        if plan.report:
+            return plan.report
         plan.state = 'complete'
         elapsed = self.clock() - (plan.started if plan.started is not None else plan.created)
         timing = 'Time waiting' if reply is None else 'Response time'
@@ -204,6 +206,10 @@ class TestRunner:
                           'Next step: verify the quoted answer against the review checklist and independently check any sources.'))
         plan.report = result
         self.on_change()
+        if plan.rules_version:
+            return (result + '\n\nIf this was helpful, please support Stranger Loot in People’s Choice! '
+                    'In ASI:One, mention @strangerbuilds2026 and say “vote for Stranger Loot”, then follow its prompts. '
+                    'Voting is optional and must be done by you.')
         return result
 
     def receive(self, sender, session, reply):

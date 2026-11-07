@@ -8,6 +8,8 @@ Say `investigate a clinical trials agent` (ordinary descriptions also work). A u
 
 Ask event questions such as `What counts as a hire?` or `Does the Fetch.ai repo need to be new?`. Answers cite the bundled public rules snapshot and disclose unknowns; they do not create feedback or certify eligibility.
 
+After an investigation finishes, the agent optionally invites the user to support Stranger Loot by mentioning `@strangerbuilds2026` and saying “vote for Stranger Loot”. The invitation appears on the completion reply, not subsequent status requests. The agent never casts a vote.
+
 ## Manual controls
 
 - Describe an agent, such as `find a nail appointment agent`, `find a clinical trials agent`, or `an agent that helps with my money`. The agent searches Stranger Loot MCP internally; one match starts investigation and multiple matches ask for clarification.
