@@ -15,9 +15,13 @@ GROUPS = [
 ]
 
 
-def normalize_user_text(text):
-    """ASI includes the recipient mention in TextContent; strip only our own prefix."""
-    return re.sub(r'^@stranger-loot-tester(?:\s+|$)', '', text.strip(), count=1, flags=re.I).strip()
+def normalize_user_text(text, own_address=None):
+    """ASI uses our address on profile first turns and our handle on later turns."""
+    recipients = ['stranger-loot-tester']
+    if own_address:
+        recipients.append(own_address)
+    pattern = r'^@(?:' + '|'.join(re.escape(recipient) for recipient in recipients) + r')(?:\s+|$)'
+    return re.sub(pattern, '', text.strip(), count=1, flags=re.I).strip()
 
 
 def words(text):

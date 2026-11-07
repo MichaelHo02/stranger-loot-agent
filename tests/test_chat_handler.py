@@ -41,6 +41,13 @@ class ChatHandlerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.text(), 'Connected')
         self.assertEqual(response.content[-1].type, 'end-session')
 
+    async def test_first_profile_turn_address_is_removed_at_handler_boundary(self):
+        raw = '@' + self.context.agent.address + ' mcp tools'
+        message = ChatMessage(content=[TextContent(type='text', text=raw)])
+        with patch.object(chat, 'reply_to_command', return_value='Connected') as reply:
+            await chat.handle_message(self.context, 'owner', message)
+        self.assertEqual(reply.call_args.args[0], 'mcp tools')
+
     async def test_prefixed_number_selection_creates_plan_without_contacting_target(self):
         state = WorkflowState(self.context.storage)
         state.shortlists.save('owner', self.context.session, [{'target_address': 'agent1' + 'q' * 59}])

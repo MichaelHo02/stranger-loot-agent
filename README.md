@@ -59,4 +59,4 @@ Work and push directly on `main` (see `AGENTS.md`). Keep `.env`, credentials and
 
 ## ASI compatibility
 
-ASI prefixes text with the recipient mention. The handler removes only its own leading `@stranger-loot-tester` mention. Replies include the Chat Protocol completion marker. Test replies are handled asynchronously in separate hosted invocations, matched by target address and session, and delivered to the original requester. A timeout without a subsequent message is not proactively announced; send `status` to check it.
+ASI prefixes text with the recipient mention. The first profile message uses the full agent address, while later turns use `@stranger-loot-tester`. The handler removes either of its own leading mentions. See [the captured first-turn root cause](docs/ASI_FIRST_TURN_ROOT_CAUSE.md). Replies include the Chat Protocol completion marker. Test replies are handled asynchronously in separate hosted invocations, matched by target address and session, and delivered to the original requester. A timeout without a subsequent message is not proactively announced; send `status` to check it.

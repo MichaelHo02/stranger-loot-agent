@@ -8,6 +8,18 @@ ADDRESS = 'agent1' + 'q' * 59
 
 
 class DiscoveryTests(unittest.TestCase):
+    def test_asi_first_profile_message_uses_our_address_instead_of_handle(self):
+        own_address = 'agent1qg2ze5pr7lz0d2udvv59etk8628syzvk5z2y4xkemj44lvz720jtxugkuhv'
+        raw = '@' + own_address + ' Find a clinical trials agent'
+        self.assertEqual(normalize_user_text(raw, own_address=own_address), 'Find a clinical trials agent')
+
+    def test_address_normalization_preserves_other_recipients_and_task_mentions(self):
+        own_address = 'agent1' + 'z' * 59
+        other_address = 'agent1' + 'q' * 59
+        self.assertEqual(normalize_user_text('@' + other_address + ' projects', own_address=own_address), '@' + other_address + ' projects')
+        command = 'test 1 | Repeat @' + own_address + ' | expected text'
+        self.assertEqual(normalize_user_text('@' + own_address + ' ' + command, own_address=own_address), command)
+
     def test_asi_recipient_prefix_does_not_become_search_terms(self):
         self.assertEqual(normalize_user_text('@stranger-loot-tester Find a clinical trials agent'), 'Find a clinical trials agent')
         self.assertEqual(normalize_user_text('@STRANGER-LOOT-TESTER\nconfirm token'), 'confirm token')

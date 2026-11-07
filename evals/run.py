@@ -76,7 +76,7 @@ def run_discovery(mode):
                     connect=lambda self: {'query_publiccatalogue': {}},
                     request=lambda *args, **kwargs: {'structuredContent': {'records': [{'snapshot': fixture}]}})
             with manager:
-                query = search_description(normalize_user_text(case['prompt']))
+                query = search_description(normalize_user_text(case['prompt'], own_address=case.get('recipient_address')))
                 if query is None:
                     raise ValueError('Prompt did not enter the discovery path')
                 reply, matches = StrangerLootMCP().discover(query)

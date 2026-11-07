@@ -81,5 +81,12 @@
     "id": "nail-website-exclusion",
     "prompt": "Find a nail appointment agent",
     "expect_empty": true
+  },
+  {
+    "id": "asi-profile-address-prefix",
+    "prompt": "@agent1qg2ze5pr7lz0d2udvv59etk8628syzvk5z2y4xkemj44lvz720jtxugkuhv Find a clinical trials agent",
+    "recipient_address": "agent1qg2ze5pr7lz0d2udvv59etk8628syzvk5z2y4xkemj44lvz720jtxugkuhv",
+    "expected_name": "TrialFinder",
+    "require_address": true
   }
 ]

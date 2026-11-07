@@ -45,7 +45,7 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
                 content=[TextContent(type="text", text=report), EndSessionContent(type="end-session")]))
         return
 
-    text = normalize_user_text(msg.text() or "")
+    text = normalize_user_text(msg.text() or "", own_address=ctx.agent.address)
     if not text:
         return
 
