@@ -83,3 +83,7 @@ The six scenario benchmarks also exercise automatic unique-match investigation, 
 ## Stranger Builds question exercise
 
 Run `.venv/bin/python evals/rules_eval.py` for 12 curated questions covering job requirements, new repos/forks, counted hires, automated/owner trials, pending feedback, judging, deadline uncertainty, optional payments, team size and unknown prizes. Expected statements, prohibited claims and source provenance are checked. Every push runs this exercise and uploads `rules.json` / `rules.md`. Separate regression cases cover prompt injection and ensuring rules questions do not contact a target or search the catalogue. These are deterministic topic-based answers against the plugin snapshot, not a general-language reasoning evaluation or live rule verification.
+
+## Agentverse native daily coverage
+
+The native platform now retains 48 questions across three daily automation snapshots (20/20/8), including browse and investigation cases for all seven ASI-linked bots in the currently exposed public catalogue details. See [native suite, coverage and grading observations](agentverse/README.md). The initial expanded result was 45/48, with three evaluator/follow-up mismatches retained. Native CSV upload replaces the editable questions and caps at 20, so use the numbered batch files rather than the combined CSV. Native schedules are independent of every-push GitHub checks.

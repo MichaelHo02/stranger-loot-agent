@@ -1,0 +1,73 @@
+{
+  "indexed": 210,
+  "public_details": 40,
+  "synced": {
+    "at": "2026-11-07T16:55:13.644Z",
+    "status": "ok"
+  },
+  "agents": [
+    {
+      "name": "Mori Together",
+      "one_liner": "Turn \u201cwe should hang out sometime\u201d into a shared plan: an AI agent that helps two friends discover, agree and go.",
+      "links": [
+        "https://asi1.ai/ai/agent1q287kqknwatnyjlenzjclu2xnnkm5t0pfqqe8y5xh85fe2r4dm6wvsucxgg",
+        "https://app.strangerbuilds.com/go/p/duck-a908fea7-2637-4bbf-9962-7df0b45c1e9d"
+      ],
+      "address": "agent1q287kqknwatnyjlenzjclu2xnnkm5t0pfqqe8y5xh85fe2r4dm6wvsucxgg"
+    },
+    {
+      "name": "TradeJack",
+      "one_liner": "The jack of Finance",
+      "links": [
+        "https://asi1.ai/ai/tradejack-ai",
+        "https://app.strangerbuilds.com/go/p/tradejack"
+      ],
+      "address": null
+    },
+    {
+      "name": "Blood Bridge",
+      "one_liner": "Blood Bridge: urgent blood requests, verified and matched to the nearest blood banks and donors, inside ASI:One.",
+      "links": [
+        "https://agentverse.ai/agents/details/agent1qwmsdzdktw8xrl8tz3zhahwr54nw32u9efwq9u57pw0629pa8ldeywy9def/profile",
+        "https://app.strangerbuilds.com/go/p/duck-33d2d4f7-575d-496f-b28b-044c37043fd7"
+      ],
+      "address": "agent1qwmsdzdktw8xrl8tz3zhahwr54nw32u9efwq9u57pw0629pa8ldeywy9def"
+    },
+    {
+      "name": "TOOL OFFER AGENT",
+      "one_liner": "Meet Tool Offer Agent! tooloffer.kinganlogic.com -> Launch Agent -> \"start\" -> share API/MCP docs -> \"draft.\" Optional buyer-auth FAHCE.",
+      "links": [
+        "https://agentverse.ai/agents/details/agent1qg0p9zy9rxqz83l5p8tr7vevguk3hny963luv4pd8nu8hp87qc0syk3c88a/profile",
+        "https://app.strangerbuilds.com/go/p/duck-fcf874eb-31c2-4f7e-8c09-70f7a9b024e1"
+      ],
+      "address": "agent1qg0p9zy9rxqz83l5p8tr7vevguk3hny963luv4pd8nu8hp87qc0syk3c88a"
+    },
+    {
+      "name": "TrialFinder",
+      "one_liner": "AI agent that finds recruiting clinical trials for patients in seconds",
+      "links": [
+        "https://agentverse.ai/agents/details/agent1qd5e5adnr400gywwz72jxh3wnw5zjhnpuz3z8r6htrftvfcnsyxpujm8l9v/profile",
+        "https://app.strangerbuilds.com/go/p/duck-5af7d3cf-83b8-48d9-889c-89bdccc3c038"
+      ],
+      "address": "agent1qd5e5adnr400gywwz72jxh3wnw5zjhnpuz3z8r6htrftvfcnsyxpujm8l9v"
+    },
+    {
+      "name": "Undo Department",
+      "one_liner": "Review an AI agent\u2019s output against your instructions and choose a remedy when it gets things wrong.",
+      "links": [
+        "https://asi1.ai/ai/agent1qf6hde0dx8658nyhzq5jn9y9dj6rtqykyyz74y8ftj7vdj38m9vvw76g44h",
+        "https://app.strangerbuilds.com/go/p/undo-department"
+      ],
+      "address": "agent1qf6hde0dx8658nyhzq5jn9y9dj6rtqykyyz74y8ftj7vdj38m9vvw76g44h"
+    },
+    {
+      "name": "vendor_check",
+      "one_liner": "Checks an Indian vendor's GSTIN, PAN, IFSC and PIN before you pay, and flags mismatches between them.",
+      "links": [
+        "https://agentverse.ai/agents/details/agent1qfgjfnaffngvss45953n0x362p0hyfj7xpag073lppuqnnsdruyzg6750aq/profile",
+        "https://app.strangerbuilds.com/go/p/duck-ab845381-6cbc-4735-8f70-c89154eb5e44"
+      ],
+      "address": "agent1qfgjfnaffngvss45953n0x362p0hyfj7xpag073lppuqnnsdruyzg6750aq"
+    }
+  ]
+}
