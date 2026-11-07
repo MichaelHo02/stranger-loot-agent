@@ -62,6 +62,8 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         await self.plan()
         result = await self.confirm(missing)
         self.assertIn('BLOCKED', result)
+        self.assertIn('Time waiting:', result)
+        self.assertNotIn('Response time:', result)
         self.assertNotIn('0/100', result)
 
     async def test_wrong_answer_fails_only_assertion(self):
@@ -141,6 +143,8 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         self.now = 61
         result = await self.runner.command(OWNER, 'session', 'status', SELF, self.exchange)
         self.assertIn('BLOCKED', result)
+        self.assertIn('Time waiting:', result)
+        self.assertNotIn('Response time:', result)
         self.assertNotIn('0/100', result)
         self.assertIsNone(self.runner.receive(TARGET, 'session', '42'))
 

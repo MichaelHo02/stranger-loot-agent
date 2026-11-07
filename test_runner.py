@@ -170,7 +170,8 @@ class TestRunner:
     def finish(self, plan, reply):
         plan.state = 'complete'
         elapsed = self.clock() - (plan.started if plan.started is not None else plan.created)
-        header = f'Test results for {plan.name}\n\nMessage sent: {plan.task}\nResponse time: {elapsed:.1f} seconds\n'
+        timing = 'Time waiting' if reply is None else 'Response time'
+        header = f'Test results for {plan.name}\n\nMessage sent: {plan.task}\n{timing}: {elapsed:.1f} seconds\n'
         if reply is None:
             result = header + 'BLOCKED — I could not get a usable reply within the response window, or delivery failed. There is no score. This does not prove the agent is broken.'
         elif len(reply) > MAX_REPLY:
