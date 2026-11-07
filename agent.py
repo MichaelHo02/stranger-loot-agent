@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from uuid import uuid4
 
@@ -8,6 +9,8 @@ from uagents_core.contrib.protocols.chat import (
     TextContent,
     chat_protocol_spec,
 )
+
+from mcp_client import reply_to_command
 
 agent = Agent()
 
@@ -26,7 +29,10 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     if not text:
         return
 
-    reply = f"Stranger Loot Tester received: {text}"
+    try:
+        reply = await asyncio.to_thread(reply_to_command, text)
+    except Exception:
+        reply = "Stranger Loot MCP is unavailable right now. Please try again later."
     content = [TextContent(type="text", text=reply)]
     await ctx.send(
         sender,
