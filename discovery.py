@@ -14,6 +14,11 @@ GROUPS = [
 ]
 
 
+def normalize_user_text(text):
+    """ASI includes the recipient mention in TextContent; strip only our own prefix."""
+    return re.sub(r'^@stranger-loot-tester(?:\s+|$)', '', text.strip(), count=1, flags=re.I).strip()
+
+
 def words(text):
     return set(re.findall(r'[^\W_]+', text.casefold()))
 
@@ -47,7 +52,7 @@ def rank_projects(items, query):
 
 
 class Shortlists:
-    def __init__(self, clock=time.monotonic):
+    def __init__(self, clock=time.time):
         self.clock = clock
         self.results = {}
 

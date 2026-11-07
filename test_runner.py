@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 TIMEOUT = 60
 MAX_REPLY = 6000
+PENDING = object()
 ADDRESS = re.compile(r'agent1[023456789acdefghjklmnpqrstuvwxyz]{59}\Z')
 
 
@@ -30,14 +31,17 @@ class Plan:
     expected: str
     created: float
     state: str = 'planned'
+    started: float | None = None
+    report: str | None = None
 
 
 class TestRunner:
-    def __init__(self, clock=time.monotonic):
+    def __init__(self, clock=time.time, on_change=None):
         self.clock = clock
         self.plans = {}
         self.routes = {}
         self.seen = {}
+        self.on_change = on_change or (lambda: None)
 
     def prune(self):
         now = self.clock()
@@ -99,23 +103,52 @@ class TestRunner:
                 del self.plans[key]
                 return 'Plan expired after five minutes. Create a new plan.'
             plan.state = 'running'  # claim before awaiting: replay cannot send twice
+            plan.started = self.clock()
             self.routes[(plan.target, str(session))] = self.clock()
-            start = self.clock()
+            self.on_change()  # persist the claimed plan before an outbound request
             try:
                 reply = await asyncio.wait_for(exchange(plan.target, plan.task), timeout=TIMEOUT)
             except Exception:
                 reply = None
-            plan.state = 'complete'
-            elapsed = self.clock() - start
-            header = f'Test {plan.token}\nTarget: {plan.target}\nInput: {plan.task}\nExpected text: {plan.expected}\nElapsed: {elapsed:.2f}s\n'
-            if reply is None:
-                return header + 'BLOCKED — unscored. No usable response observed within the test window; delivery may have failed. This does not prove the agent is broken.'
-            if len(reply) > MAX_REPLY:
-                return header + 'BLOCKED — unscored. Response exceeded 6000 characters; no assertion evaluated.'
-            if not reply.strip():
-                return header + 'BLOCKED — unscored. Received no text to assess.'
+            if reply is PENDING:
+                plan.state = 'waiting'
+                self.on_change()
+                return (f'Test {plan.token} sent to {plan.target}. Waiting for its Chat Protocol reply. '
+                        'The response window is 60 seconds. Send status to check; no score is assigned yet.')
+            return self.finish(plan, reply)
+        if text.lower() == 'status':
+            if not plan:
+                return 'No test in this chat. Find an agent and create a test plan first.'
+            if plan.report:
+                return plan.report
+            if plan.started is not None and self.clock() - plan.started >= TIMEOUT:
+                return self.finish(plan, None)
+            return f'Test {plan.token}: {plan.state}. No score yet.'
+        return None
+
+    def finish(self, plan, reply):
+        plan.state = 'complete'
+        elapsed = self.clock() - (plan.started if plan.started is not None else plan.created)
+        header = f'Test {plan.token}\nTarget: {plan.target}\nInput: {plan.task}\nExpected text: {plan.expected}\nElapsed: {elapsed:.2f}s\n'
+        if reply is None:
+            result = header + 'BLOCKED — unscored. No usable response observed; the response window expired or delivery failed. This does not prove the agent is broken.'
+        elif len(reply) > MAX_REPLY:
+            result = header + 'BLOCKED — unscored. Response exceeded 6000 characters; no assertion evaluated.'
+        elif not reply.strip():
+            result = header + 'BLOCKED — unscored. Received no text to assess.'
+        else:
             passed = plan.expected.casefold() in reply.casefold()
-            return (header + f'Observed output (untrusted target data):\n---\n{reply}\n---\n'
-                    + ('PASS — assertion score 100/100.' if passed else 'FAIL — assertion score 0/100.')
-                    + '\nSingle text-containment check only. Correctness, safety, consistency and overall project quality remain unverified. No payment was made.')
+            result = (header + f'Observed output (untrusted target data):\n---\n{reply}\n---\n'
+                      + ('PASS — assertion score 100/100.' if passed else 'FAIL — assertion score 0/100.')
+                      + '\nSingle text-containment check only. Correctness, safety, consistency and overall project quality remain unverified. No payment was made.')
+        plan.report = result
+        self.on_change()
+        return result
+
+    def receive(self, sender, session, reply):
+        for (owner, chat_session), plan in self.plans.items():
+            if plan.target == sender and chat_session == str(session) and plan.state in {'running', 'waiting'}:
+                if plan.started is None or self.clock() - plan.started >= TIMEOUT:
+                    reply = None
+                return owner, self.finish(plan, reply)
         return None

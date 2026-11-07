@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from discovery import Shortlists, rank_projects, search_description
+from discovery import Shortlists, normalize_user_text, rank_projects, search_description
 from mcp_client import StrangerLootMCP, reply_to_command
 from test_runner import agent_address
 
@@ -8,6 +8,17 @@ ADDRESS = 'agent1' + 'q' * 59
 
 
 class DiscoveryTests(unittest.TestCase):
+    def test_asi_recipient_prefix_does_not_become_search_terms(self):
+        self.assertEqual(normalize_user_text('@stranger-loot-tester Find a clinical trials agent'), 'Find a clinical trials agent')
+        self.assertEqual(normalize_user_text('@STRANGER-LOOT-TESTER\nconfirm token'), 'confirm token')
+        self.assertEqual(normalize_user_text('projects'), 'projects')
+
+    def test_normalization_preserves_other_mentions_and_task_content(self):
+        self.assertEqual(normalize_user_text('@other-agent projects'), '@other-agent projects')
+        command = 'test 1 | Repeat @stranger-loot-tester | @stranger-loot-tester'
+        self.assertEqual(normalize_user_text('@stranger-loot-tester ' + command), command)
+        self.assertEqual(normalize_user_text('@stranger-loot-tester-extra projects'), '@stranger-loot-tester-extra projects')
+
     def test_only_public_agent_entries_are_discovered(self):
         result = {'structuredContent': {'records': [{'snapshot': {
             'lastSync': {'at': '2026-11-07'}, 'total': 207, 'free': [

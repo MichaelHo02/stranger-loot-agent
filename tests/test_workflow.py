@@ -1,6 +1,6 @@
 import asyncio
 import unittest
-from test_runner import TestRunner
+from test_runner import PENDING, TestRunner
 from discovery import Shortlists
 
 TARGET = 'agent1' + 'q' * 59
@@ -120,3 +120,26 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         lists.save(OWNER, 'session', [{'target_address': 'agent1' + 'x' * 59}])
         await self.confirm()
         self.assertEqual(self.calls, [(TARGET, 'What is 6 * 7?')])
+
+    async def test_async_target_reply_is_correlated_and_scored_once(self):
+        async def sent(*args):
+            return PENDING
+        await self.plan()
+        self.assertIn('Waiting', await self.confirm(sent))
+        self.assertIsNone(self.runner.receive('other', 'session', '42'))
+        self.assertIsNone(self.runner.receive(TARGET, 'wrong-session', '42'))
+        owner, report = self.runner.receive(TARGET, 'session', 'The answer is 42')
+        self.assertEqual(owner, OWNER)
+        self.assertIn('100/100', report)
+        self.assertIsNone(self.runner.receive(TARGET, 'session', 'second answer'))
+
+    async def test_async_timeout_status_is_unscored_and_late_reply_is_ignored(self):
+        async def sent(*args):
+            return PENDING
+        await self.plan()
+        await self.confirm(sent)
+        self.now = 61
+        result = await self.runner.command(OWNER, 'session', 'status', SELF, self.exchange)
+        self.assertIn('BLOCKED', result)
+        self.assertNotIn('0/100', result)
+        self.assertIsNone(self.runner.receive(TARGET, 'session', '42'))

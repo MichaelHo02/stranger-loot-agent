@@ -8,7 +8,8 @@ Find ASI/Agentverse projects in Stranger Loot and run a confirmed, single-messag
 - `projects` or `projects <search words>` also searches the same public catalogue.
 - Choose a candidate with `test 1 | <fictional task> | <expected text>`. The number is resolved from your latest shortlist in this chat; there is no need to copy an agent address.
 - `test <agent1 address or ASI/Agentverse profile link> | <fictional task> | <expected text>`: prepare a test plan.
-- `confirm <plan token>`: send the exact task once, wait up to 60 seconds, and report the observed text and timing.
+- `confirm <plan token>`: send the exact task once. A correlated target reply produces an evidence report.
+- `status`: retrieve the report or check a pending test. After its 60-second response window, a status check reports the test as blocked and unscored.
 - `cancel`: discard a pending plan without sending a test.
 - `mcp tools`: check the read-only catalogue connection.
 
@@ -32,7 +33,7 @@ Discovery reads the `current` public catalogue exposed by Stranger Loot MCP. It 
 
 Candidates need a published ASI/Agentverse link. A handle-only ASI link can appear in the shortlist, but cannot be tested until its actual Chat Protocol address is published; no address is guessed. Numbered choices expire after five minutes and are isolated by sender and chat session. Choosing a result only creates a plan; it never sends a test before confirmation. A new search does not alter an already prepared plan. Direct addresses and profile links remain supported.
 
-One test is allowed per chat session during a 15-minute in-memory retention window, preventing reuse of a response session for a second test. Start a new chat for another run. State and duplicate suppression reset on restart. Maximum 100 retained plans and 2000 recent incoming message identifiers per process.
+One test is allowed per chat session during a 15-minute in-memory retention window, preventing reuse of a response session for a second test. Start a new chat for another run. Workflow state and duplicate suppression use Agentverse storage because hosted Python globals reset between messages. State uses wall-clock timestamps so retention survives separate runtimes. Stale entries expire through normal retention. Maximum 100 retained plans and 2000 recent incoming message identifiers per process.
 
 ## MCP connection
 
@@ -53,3 +54,7 @@ uv pip install --python .venv/bin/python 'uagents==0.26.1'
 Tests cover plan confirmation, ownership/session isolation, expiration, cancellation, replay and concurrent-confirmation protection, scoring, timeouts, oversized responses, discovery scope, and real uAgents dispatcher correlation. They use controlled responses and make no calls to other people's agents. GitHub Actions runs them on pushes and pull requests. These checks do not establish successful live delivery to a third-party agent.
 
 Work and push directly on `main` (see `AGENTS.md`). Keep `.env`, credentials and `.avctl/` local. Agentverse manages identity. Deploy with `avctl hosting deploy`, then inspect `avctl hosting logs`. GitHub pushes do not update Agentverse.
+
+## ASI compatibility
+
+ASI prefixes text with the recipient mention. The handler removes only its own leading `@stranger-loot-tester` mention. Replies include the Chat Protocol completion marker. Test replies are handled asynchronously in separate hosted invocations, matched by target address and session, and delivered to the original requester. A timeout without a subsequent message is not proactively announced; send `status` to check it.

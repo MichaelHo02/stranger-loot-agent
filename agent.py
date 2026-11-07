@@ -6,16 +6,16 @@ from uagents import Agent, Context, Protocol
 from uagents_core.contrib.protocols.chat import (
     ChatAcknowledgement,
     ChatMessage,
+    EndSessionContent,
     TextContent,
     chat_protocol_spec,
 )
 
 from mcp_client import reply_to_command
-from test_runner import TestRunner
-from discovery import Shortlists
+from discovery import normalize_user_text
+from workflow_state import WorkflowState
+from test_runner import PENDING
 
-runner = TestRunner()
-shortlists = Shortlists()
 
 agent = Agent()
 
@@ -30,10 +30,22 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         ChatAcknowledgement(timestamp=datetime.now(timezone.utc), acknowledged_msg_id=msg.msg_id),
     )
 
-    if runner.duplicate(sender, msg.msg_id) or runner.is_target_reply(sender, ctx.session):
+    state = WorkflowState(ctx.storage)
+    runner = state.runner
+    shortlists = state.shortlists
+    if runner.duplicate(sender, msg.msg_id):
+        return
+    if runner.is_target_reply(sender, ctx.session):
+        result = runner.receive(sender, ctx.session, msg.text() or "")
+        state.save()
+        if result:
+            owner, report = result
+            await ctx.send(owner, ChatMessage(
+                timestamp=datetime.now(timezone.utc), msg_id=uuid4(),
+                content=[TextContent(type="text", text=report), EndSessionContent(type="end-session")]))
         return
 
-    text = msg.text()
+    text = normalize_user_text(msg.text() or "")
     if not text:
         return
 
@@ -41,18 +53,14 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         text = "help"
 
     async def exchange(target, task):
-        response, status = await ctx.send_and_receive(
+        status = await ctx.send(
             target,
             ChatMessage(timestamp=datetime.now(timezone.utc), msg_id=uuid4(),
                         content=[TextContent(type="text", text=task)]),
-            response_type=ChatMessage,
-            timeout=60,
         )
-        if response is None:
+        if getattr(status, "status", None) == "failed":
             return None
-        await ctx.send(target, ChatAcknowledgement(
-            timestamp=datetime.now(timezone.utc), acknowledged_msg_id=response.msg_id))
-        return response.text()
+        return PENDING
 
     try:
         try:
@@ -66,7 +74,8 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
             reply = await asyncio.to_thread(reply_to_command, text, shortlists, sender, ctx.session)
     except Exception:
         reply = "Stranger Loot MCP is unavailable right now. Please try again later."
-    content = [TextContent(type="text", text=reply)]
+    state.save()
+    content = [TextContent(type="text", text=reply), EndSessionContent(type="end-session")]
     await ctx.send(
         sender,
         ChatMessage(timestamp=datetime.now(timezone.utc), msg_id=uuid4(), content=content),
